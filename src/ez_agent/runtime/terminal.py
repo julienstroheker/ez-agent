@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import sys
 from typing import TYPE_CHECKING
 
 from rich.console import Console
@@ -149,7 +148,6 @@ class TerminalRunner:
 
         elif cmd == "/logs":
             # Toggle logging visibility
-            import logging
             ez_logger = logging.getLogger("ez_agent")
             if ez_logger.level == logging.WARNING:
                 ez_logger.setLevel(logging.INFO)

@@ -58,7 +58,7 @@ class TestInitCommand:
 
     def test_init_with_name(self, runner: CliRunner, tmp_path: Path):
         """Test init with provided name."""
-        result = runner.invoke(
+        runner.invoke(
             app,
             ["init", "-o", str(tmp_path), "-n", "TestAgent"],
             input="\n\n\n1\n\ny\ny\ny\n\n",  # Accept defaults

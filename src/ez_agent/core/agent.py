@@ -197,7 +197,7 @@ class Agent:
 
         except Exception as e:
             logger.exception(f"Error processing message: {e}")
-            task = await self._task_manager.fail_task(task.id, str(e))
+            await self._task_manager.fail_task(task.id, str(e))
             raise
 
     async def stream_message(
@@ -299,7 +299,7 @@ class Agent:
 
         except Exception as e:
             logger.exception(f"Error streaming message: {e}")
-            task = await self._task_manager.fail_task(task.id, str(e))
+            await self._task_manager.fail_task(task.id, str(e))
             raise
 
     async def _build_message_history(self, context: AgentContext) -> None:

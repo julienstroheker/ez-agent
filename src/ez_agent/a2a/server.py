@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import json
 import logging
-import uuid
 from contextlib import asynccontextmanager
-from datetime import datetime
 from typing import TYPE_CHECKING, Any, AsyncIterator
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sse_starlette.sse import EventSourceResponse
@@ -18,10 +16,7 @@ from ez_agent.a2a.models import (
     AgentCapabilities,
     AgentCard,
     AgentSkill,
-    CancelTaskRequest,
     ErrorResponse,
-    GetTaskRequest,
-    ListTasksRequest,
     ListTasksResponse,
     Message,
     MessageRole,
