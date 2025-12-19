@@ -1,5 +1,7 @@
 # EZ-Agent
 
+[![CI](https://github.com/julienstroheker/ez-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/julienstroheker/ez-agent/actions/workflows/ci.yml)
+
 A CLI framework for developing, testing, and deploying AI agents using YAML configuration.
 
 ## Overview
