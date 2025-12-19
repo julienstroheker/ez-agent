@@ -10,22 +10,19 @@ on:
 
 jobs:
   test:
-    name: Test on Python ${{ matrix.python-version }}
+    name: Test on Python 3.12
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12"]
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
           cache: 'pip'
       
       - name: Install dependencies
@@ -49,7 +46,6 @@ jobs:
       
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
-        if: matrix.python-version == '3.12'
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
@@ -57,6 +53,7 @@ jobs:
   cli-validation:
     name: Validate CLI commands
     runs-on: ubuntu-latest
+    needs: test
     permissions:
       contents: read
     
@@ -86,8 +83,16 @@ jobs:
           mkdir -p /tmp/test-agent
           
           # Run ezagent init with non-interactive inputs
-          # Input sequence: description(Enter), model(Enter), provider(1), endpoint(Enter), streaming(y), tools(y), history(y), instructions(Enter)
-          echo -e "\n\n1\n\ny\ny\ny\n\n" | ezagent init -o /tmp/test-agent -n TestAgent
+          # Input sequence (each line corresponds to a prompt):
+          # 1. Description (empty = default)
+          # 2. Model (empty = default)
+          # 3. Provider choice (1 = Azure)
+          # 4. Azure endpoint (empty = default)
+          # 5. Enable streaming (y)
+          # 6. Enable tools (y)
+          # 7. Enable history (y)
+          # 8. Instructions (empty = default)
+          printf '\n\n1\n\ny\ny\ny\n\n' | ezagent init -o /tmp/test-agent -n TestAgent
           
           # Find the generated config file
           CONFIG_FILE=$(find /tmp/test-agent -name "*.yaml" -type f | head -n 1)
