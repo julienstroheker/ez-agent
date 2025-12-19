@@ -1,0 +1,130 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ez-agent"
+version = "0.1.0"
+description = "A CLI framework for developing, testing, and deploying AI agents using YAML configuration"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "EZ-Agent Team" }
+]
+keywords = ["ai", "agent", "cli", "llm", "azure", "a2a"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "pyyaml>=6.0.1",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "sse-starlette>=2.0.0",
+    "httpx>=0.26.0",
+    # Azure AI Foundry SDK - works with any model (OpenAI, Phi, Mistral, Llama, etc.)
+    # Using preview version 1.2.0b6+ for MCP (Model Context Protocol) tool support
+    "azure-ai-projects>=1.0.0",
+    "azure-ai-agents>=1.2.0b6",
+    "azure-identity>=1.15.0",
+    "structlog>=24.1.0",
+    # A2A (Agent-to-Agent) Protocol SDK - official Python SDK for A2A protocol
+    # Used for agent-to-agent communication following the open standard
+    "a2a-sdk>=0.3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.8.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.6.0",
+]
+# Azure AI Foundry tracing - optional for observability
+tracing = [
+    "azure-monitor-opentelemetry>=1.6.0",
+    "azure-core-tracing-opentelemetry>=1.0.0",
+    "opentelemetry-sdk>=1.20.0",
+]
+
+[project.scripts]
+ezagent = "ez_agent.cli.main:app"
+
+[project.urls]
+Homepage = "https://github.com/julienstroheker/ez-agent"
+Documentation = "https://github.com/julienstroheker/ez-agent#readme"
+Repository = "https://github.com/julienstroheker/ez-agent"
+Issues = "https://github.com/julienstroheker/ez-agent/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ez_agent"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ez_agent"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["azure.*", "sse_starlette.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --cov=ez_agent --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/ez_agent"]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]

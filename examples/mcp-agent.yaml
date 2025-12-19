@@ -1,0 +1,49 @@
+# MCP Tool Agent Example
+# Connects to external MCP (Model Context Protocol) servers
+#
+# MCP allows agents to use tools exposed by external servers.
+# See: https://modelcontextprotocol.io/
+#
+# Run with: ezagent run -c examples/mcp-agent.yaml -m terminal
+
+name: MCPAgent
+description: An AI assistant with MCP tool integration
+version: 1.0.0
+
+instructions: |
+  You are a helpful assistant that can search and analyze code repositories.
+  Use the MCP tools to search for code, read files, and answer questions
+  about repository structure and content.
+  
+  When asked about code, use the available tools to fetch accurate information.
+
+model: gpt-4o
+
+configuration:
+  provider: azure_foundry
+  azure:
+    endpoint: ${AZURE_AI_ENDPOINT}
+    auth_method: default_credential
+  logging:
+    level: INFO
+
+features:
+  streaming: true
+  tool_execution: true
+
+tools:
+  # MCP Tool - GitHub Repository Access via gitmcp.io
+  - name: github_repo
+    type: mcp
+    description: Access a GitHub repository via MCP
+    server_url: https://gitmcp.io/microsoft/typescript
+    server_label: github_typescript
+    require_approval: never
+
+  # Add more MCP servers as needed
+  # - name: custom_mcp
+  #   type: mcp
+  #   server_url: https://your-mcp-server.com/mcp
+  #   server_label: custom
+  #   headers:
+  #     Authorization: "Bearer ${MCP_API_KEY}"

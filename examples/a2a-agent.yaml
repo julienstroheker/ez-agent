@@ -1,0 +1,51 @@
+# A2A (Agent-to-Agent) Tool Example
+# Demonstrates multi-agent orchestration using the A2A protocol
+#
+# A2A tools allow your agent to delegate tasks to specialized agents.
+# See: https://a2a-protocol.org/
+#
+# Run with: ezagent run -c examples/a2a-agent.yaml -m terminal
+
+name: OrchestratorAgent
+description: An orchestrator agent that delegates tasks to specialized agents
+version: 1.0.0
+
+instructions: |
+  You are an orchestrator agent that coordinates work between specialized agents.
+  
+  Available specialized agents:
+  - Research Agent: For information gathering and analysis
+  - Code Agent: For code review and generation tasks
+  
+  Analyze each request and determine which agent should handle it,
+  or answer directly if you can handle the request yourself.
+  
+  When delegating, provide clear context about what the user needs.
+
+model: gpt-4o
+
+configuration:
+  provider: azure_foundry
+  azure:
+    endpoint: ${AZURE_AI_ENDPOINT}
+    auth_method: default_credential
+  logging:
+    level: INFO
+
+features:
+  streaming: true
+  tool_execution: true
+
+tools:
+  # A2A Tool - Connect to another A2A-compliant agent
+  - name: research_agent
+    type: agent
+    description: A specialized research agent for information gathering
+    agent_endpoint: https://research-agent.example.com
+    headers:
+      Authorization: "Bearer ${RESEARCH_AGENT_API_KEY}"
+
+  - name: code_agent
+    type: agent
+    description: A specialized agent for code review and generation
+    agent_endpoint: https://code-agent.example.com

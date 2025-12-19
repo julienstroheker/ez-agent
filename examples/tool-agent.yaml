@@ -1,0 +1,54 @@
+# Agent with Tools Example
+# Demonstrates function calling with custom Python tools
+#
+# Run with: ezagent run -c examples/tool-agent.yaml -m terminal
+
+name: ToolAgent
+description: An AI assistant with tool capabilities
+version: 1.0.0
+
+instructions: |
+  You are ToolAgent, an AI assistant with access to various tools.
+  
+  Available capabilities:
+  - Get current weather for any city
+  - Perform calculations
+  - Get the current time
+  
+  When a user asks about weather, time, or needs calculations,
+  use the appropriate tool. Always explain what tool you're using.
+
+model: gpt-4o
+
+configuration:
+  provider: azure_foundry
+  azure:
+    endpoint: ${AZURE_AI_ENDPOINT}
+    auth_method: default_credential
+  logging:
+    level: INFO
+    format: console
+
+features:
+  streaming: true
+  tool_execution: true
+  conversation_history: true
+
+tools:
+  - name: get_weather
+    type: function
+    description: Get current weather for a city
+    module: examples.tools
+    function: get_weather
+
+  - name: calculate
+    type: function
+    description: Evaluate a mathematical expression
+    module: examples.tools
+    function: calculate
+
+  - name: current_time
+    type: function
+    description: Get the current date and time
+    module: examples.tools
+    function: get_current_time
