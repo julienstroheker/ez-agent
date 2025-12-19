@@ -7,7 +7,7 @@ import logging
 from typing import Any, Callable
 
 from ez_agent.config.models import ToolConfig, ToolType
-from ez_agent.tools.base import FunctionTool, ITool, ToolDefinition, ToolError
+from ez_agent.tools.base import FunctionTool, ITool, ToolError
 
 logger = logging.getLogger(__name__)
 

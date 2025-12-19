@@ -7,15 +7,12 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from typing import Generator
 
 import pytest
-from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from ez_agent.a2a.models import (
-    AgentCard,
     Message,
     MessageRole,
     SendMessageRequest,
-    Task,
     TaskState,
     TextPart,
 )

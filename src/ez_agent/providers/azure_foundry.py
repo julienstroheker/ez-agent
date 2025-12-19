@@ -13,7 +13,6 @@ streaming, and proper async support.
 
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any, AsyncIterator
 
@@ -936,14 +935,10 @@ class AzureFoundryProvider(IProvider):
                 thread = create_thread_and_messages()
 
             # Get required types
-            MessageDeltaChunk = self._azure["MessageDeltaChunk"]
-            ThreadRun = self._azure["ThreadRun"]
             SubmitToolApprovalAction = self._azure["SubmitToolApprovalAction"]
             RequiredMcpToolCall = self._azure["RequiredMcpToolCall"]
             ToolApproval = self._azure["ToolApproval"]
             ToolOutput = self._azure["ToolOutput"]
-            
-            collected_content = ""
 
             # Build run kwargs with MCP and A2A tool resources if configured
             run_kwargs: dict[str, Any] = {
@@ -1096,7 +1091,6 @@ class AzureFoundryProvider(IProvider):
                                     content=response_text,
                                     is_final=False,
                                 )
-                                collected_content = response_text
                         break
                 
                 yield StreamChunk(
@@ -1147,6 +1141,7 @@ class AzureFoundryProvider(IProvider):
                 else:
                     self._agents_client.threads.delete(thread.id)
             except Exception:
+                # Ignore errors during thread cleanup - thread may already be deleted
                 pass
             
             # End spans
@@ -1202,4 +1197,5 @@ class AzureFoundryProvider(IProvider):
             try:
                 self._agents_client.close()
             except Exception:
+                # Ignore errors during client cleanup - client may already be closed
                 pass

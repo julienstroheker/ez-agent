@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-import yaml
 
 from ez_agent.config import load_config, validate_config, ConfigError
 from ez_agent.config.models import (
