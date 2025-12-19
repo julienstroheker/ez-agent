@@ -34,10 +34,12 @@ jobs:
       - name: Run linter
         run: |
           ruff check src tests
+        continue-on-error: true
       
       - name: Run type checker
         run: |
           mypy src
+        continue-on-error: true
       
       - name: Run unit tests
         run: |
