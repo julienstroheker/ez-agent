@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test on Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Run linter
+        run: |
+          ruff check src tests
+      
+      - name: Run type checker
+        run: |
+          mypy src
+      
+      - name: Run unit tests
+        run: |
+          pytest --cov=ez_agent --cov-report=xml --cov-report=term
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        if: matrix.python-version == '3.12'
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+  
+  cli-validation:
+    name: Validate CLI commands
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      
+      - name: Test ezagent --help
+        run: |
+          ezagent --help
+          echo "✓ ezagent --help works"
+      
+      - name: Test ezagent init and validate
+        run: |
+          # Create a temporary directory for testing
+          mkdir -p /tmp/test-agent
+          
+          # Run ezagent init with non-interactive inputs
+          # Input sequence: description(Enter), model(Enter), provider(1), endpoint(Enter), streaming(y), tools(y), history(y), instructions(Enter)
+          echo -e "\n\n1\n\ny\ny\ny\n\n" | ezagent init -o /tmp/test-agent -n TestAgent
+          
+          # Find the generated config file
+          CONFIG_FILE=$(find /tmp/test-agent -name "*.yaml" -type f | head -n 1)
+          
+          if [ -z "$CONFIG_FILE" ]; then
+            echo "Error: No config file generated"
+            exit 1
+          fi
+          
+          echo "Generated config file: $CONFIG_FILE"
+          cat "$CONFIG_FILE"
+          
+          # Validate the generated config
+          ezagent validate -c "$CONFIG_FILE"
+          echo "✓ ezagent init and validate work correctly"
